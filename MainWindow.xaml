@@ -1,0 +1,227 @@
+<Window x:Class="KernelDash.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:KernelDash"
+        Title="KernelDash - System Manager" Height="720" Width="1400"
+        Background="{StaticResource DarkBgBrush}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR -->
+        <Grid Grid.Column="0" Background="{StaticResource SidebarBgBrush}">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="KernelDash" Style="{StaticResource TitleStyle}" 
+                           Padding="20,20,20,10" FontSize="20"/>
+                <TextBlock Text="System Manager" Style="{StaticResource SubtitleStyle}" 
+                           Padding="20,0,20,30" FontSize="12" Foreground="#007acc"/>
+
+                <Button Content="🏠 Dashboard" Style="{StaticResource MenuButtonStyle}" 
+                        Click="OnDashboardClick" Tag="Dashboard"/>
+                <Button Content="⚙️ Prozesse" Style="{StaticResource MenuButtonStyle}" 
+                        Click="OnProcessesClick" Tag="Processes"/>
+                <Button Content="📁 Dateiwächter" Style="{StaticResource MenuButtonStyle}" 
+                        Click="OnFileWatcherClick" Tag="FileWatcher"/>
+                <Button Content="ℹ️ Info" Style="{StaticResource MenuButtonStyle}" 
+                        Click="OnInfoClick" Tag="Info"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- CONTENT AREA -->
+        <Grid Grid.Column="1" Background="{StaticResource DarkBgBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER -->
+            <Border Grid.Row="0" Background="#2d2d30" BorderBrush="#3e3e42" BorderThickness="0,0,0,1">
+                <TextBlock x:Name="PageTitle" Text="Dashboard" Style="{StaticResource TitleStyle}" 
+                           Padding="40,15,20,15" FontSize="22"/>
+            </Border>
+
+            <!-- CONTENT PAGES -->
+            <Grid Grid.Row="1" x:Name="ContentGrid">
+                <!-- Dashboard Page -->
+                <Grid x:Name="DashboardPage" Background="{StaticResource DarkBgBrush}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Border Padding="30">
+                            <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Systemübersicht" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,20"/>
+
+                            <!-- Hardware Stats -->
+                            <Border Background="{StaticResource CardBgBrush}" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Vertical" Grid.Column="0">
+                                        <TextBlock Text="CPU-Auslastung" Style="{StaticResource LabelStyle}" Foreground="#007acc"/>
+                                        <TextBlock x:Name="CpuValue" Text="0%" FontSize="32" FontWeight="Bold" 
+                                                   Foreground="{StaticResource TextBrush}" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" Grid.Column="1">
+                                        <TextBlock Text="RAM-Auslastung" Style="{StaticResource LabelStyle}" Foreground="#007acc"/>
+                                        <TextBlock x:Name="RamValue" Text="0 MB / 0 MB" FontSize="32" FontWeight="Bold" 
+                                                   Foreground="{StaticResource TextBrush}" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- System Info -->
+                            <Border Background="{StaticResource CardBgBrush}" CornerRadius="8" Padding="20" Margin="0,20,0,0">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="Systeminformationen" Style="{StaticResource LabelStyle}" Foreground="#007acc" Margin="0,0,0,15"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="Computername:" Style="{StaticResource LabelStyle}"/>
+                                        <TextBlock x:Name="ComputerName" Text="-" Style="{StaticResource LabelStyle}" 
+                                                   Grid.Column="1" Foreground="#90EE90"/>
+                                        
+                                        <TextBlock Text="OS:" Style="{StaticResource LabelStyle}" Grid.Row="1"/>
+                                        <TextBlock x:Name="OsInfo" Text="-" Style="{StaticResource LabelStyle}" 
+                                                   Grid.Column="1" Grid.Row="1" Foreground="#90EE90"/>
+                                        
+                                        <TextBlock Text="Prozessoren:" Style="{StaticResource LabelStyle}" Grid.Row="2"/>
+                                        <TextBlock x:Name="ProcessorCount" Text="-" Style="{StaticResource LabelStyle}" 
+                                                   Grid.Column="1" Grid.Row="2" Foreground="#90EE90"/>
+                                        
+                                        <TextBlock Text="RAM gesamt:" Style="{StaticResource LabelStyle}" Grid.Row="3"/>
+                                        <TextBlock x:Name="TotalRam" Text="-" Style="{StaticResource LabelStyle}" 
+                                                   Grid.Column="1" Grid.Row="3" Foreground="#90EE90"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+                </Grid>
+
+                <!-- Processes Page -->
+                <Grid x:Name="ProcessesPage" Background="{StaticResource DarkBgBrush}" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Background="{StaticResource CardBgBrush}" Padding="20" Margin="20,20,20,10">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="🔄 Aktualisieren" Style="{StaticResource ActionButtonStyle}" 
+                                    Click="OnRefreshProcesses" Width="120" Margin="0,0,15,0"/>
+                            <TextBlock Text="Laufende Prozesse:" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock x:Name="ProcessCount" Text="0" Style="{StaticResource SubtitleStyle}" 
+                                       VerticalAlignment="Center" Foreground="#007acc"/>
+                        </StackPanel>
+                    </Border>
+
+                    <DataGrid Grid.Row="1" x:Name="ProcessGrid" Margin="20,0,20,20"
+                              Background="{StaticResource CardBgBrush}"
+                              Foreground="{StaticResource TextBrush}"
+                              BorderBrush="#3e3e42"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserReorderColumns="False"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="None"
+                              AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="80"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding ProcessName}" Width="200"/>
+                            <DataGridTextColumn Header="Dateipfad" Binding="{Binding FilePath}" Width="*"/>
+                            <DataGridTemplateColumn Header="Aktion" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Beenden" Style="{StaticResource DangerButtonStyle}" 
+                                                Click="OnKillProcess"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+                <!-- File Watcher Page -->
+                <Grid x:Name="FileWatcherPage" Background="{StaticResource DarkBgBrush}" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="{StaticResource CardBgBrush}" Padding="20" Margin="20,20,20,10">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Überwachter Pfad:" Style="{StaticResource LabelStyle}" Margin="0,0,0,10"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="WatchPath" Grid.Column="0" Background="#2d2d30" 
+                                         Foreground="{StaticResource TextBrush}"
+                                         Padding="10" BorderBrush="#3e3e42" BorderThickness="1"
+                                         Text="C:\Users"/>
+                                <Button Content="📂 Durchsuchen" Style="{StaticResource ActionButtonStyle}" 
+                                        Grid.Column="1" Margin="10,0,10,0" Click="OnBrowseFolder" Width="120"/>
+                                <Button Content="▶ Starten" Style="{StaticResource ActionButtonStyle}" 
+                                        Grid.Column="2" Click="OnStartWatcher" Width="100"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Background="{StaticResource CardBgBrush}" Padding="20" Margin="20,0,20,10">
+                        <Button Content="🗑️ Protokoll löschen" Style="{StaticResource ActionButtonStyle}" 
+                                Click="OnClearLog" Width="120"/>
+                    </Border>
+
+                    <Border Grid.Row="2" Background="{StaticResource CardBgBrush}" Margin="20,0,20,20" Padding="0">
+                        <ListBox x:Name="FileWatcherLog" Background="{StaticResource CardBgBrush}"
+                                 Foreground="{StaticResource TextBrush}" BorderThickness="0"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        </ListBox>
+                    </Border>
+                </Grid>
+
+                <!-- Info Page -->
+                <Grid x:Name="InfoPage" Background="{StaticResource DarkBgBrush}" Visibility="Collapsed">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Border Padding="30">
+                            <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Über KernelDash" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,20"/>
+                            <Border Background="{StaticResource CardBgBrush}" CornerRadius="8" Padding="20">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="KernelDash v1.0.0" FontSize="18" FontWeight="Bold" 
+                                               Foreground="{StaticResource TextBrush}" Margin="0,0,0,10"/>
+                                    <TextBlock Text="Ein modernes System-Verwaltungs-Dashboard für Windows" 
+                                               Style="{StaticResource LabelStyle}" Margin="0,0,0,20"/>
+                                    <TextBlock Text="Features:" Style="{StaticResource LabelStyle}" Foreground="#007acc" Margin="0,0,0,10"/>
+                                    <TextBlock Text="✓ Echtzeit Hardware-Monitoring (CPU, RAM)" 
+                                               Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                                    <TextBlock Text="✓ Prozess-Verwaltung mit Dateipfaden" 
+                                               Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                                    <TextBlock Text="✓ Dateiüberwachung mit FileSystemWatcher" 
+                                               Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                                    <TextBlock Text="✓ Modernes Dark-Mode Design" 
+                                               Style="{StaticResource LabelStyle}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
