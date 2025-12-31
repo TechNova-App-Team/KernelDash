@@ -90,7 +90,7 @@ namespace KernelDash.Services
             }
         }
 
-        private long GetTotalPhysicalMemory()
+        public long GetTotalPhysicalMemory()
         {
             try
             {

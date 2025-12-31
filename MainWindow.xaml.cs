@@ -2,9 +2,14 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Management;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Input;
 using KernelDash.Models;
 using KernelDash.Services;
 using KernelDash.ViewModels;
@@ -18,6 +23,7 @@ namespace KernelDash
         private readonly ProcessManagerService _processManager;
         private readonly FileWatcherService _fileWatcher;
         private readonly MainViewModel _viewModel;
+        private DateTime _startTime;
 
         public MainWindow()
         {
@@ -33,14 +39,21 @@ namespace KernelDash
 
                 DataContext = _viewModel;
 
+                // Start time merken für Uptime
+                _startTime = DateTime.Now;
+
                 // Hardware-Monitoring starten
                 _systemMonitor.StartMonitoring(UpdateHardwareInfo);
 
                 // Initiale Systeminfo laden
                 LoadSystemInfo();
+                LoadDiskInfo();
 
                 // FileWatcher Event Handler
                 _fileWatcher.FileEvent += OnFileWatcherEvent;
+
+                // Tastenkürzel
+                this.KeyDown += MainWindow_KeyDown;
             }
             catch (Exception ex)
             {
@@ -48,11 +61,29 @@ namespace KernelDash
             }
         }
 
+        private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.F5)
+            {
+                OnRefreshProcesses(sender, null);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                this.Close();
+            }
+        }
+
         // ===== NAVIGATION EVENTS =====
         private void OnDashboardClick(object sender, RoutedEventArgs e)
         {
             ShowPage(DashboardPage);
-            PageTitle.Text = "Dashboard";
+            PageTitle.Text = "📊 Dashboard";
+            UpdateAllDashboardData();
+            BtnDashboard.Foreground = System.Windows.Media.Brushes.White;
+            BtnProcesses.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnFileWatch.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnInfo.Foreground = System.Windows.Media.Brushes.Gray;
         }
 
         private void OnProcessesClick(object sender, RoutedEventArgs e)
@@ -60,21 +91,33 @@ namespace KernelDash
             ShowPage(ProcessesPage);
             PageTitle.Text = "⚙️ Prozesse";
             OnRefreshProcesses(sender, e);
+            BtnDashboard.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnProcesses.Foreground = System.Windows.Media.Brushes.White;
+            BtnFileWatch.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnInfo.Foreground = System.Windows.Media.Brushes.Gray;
         }
 
         private void OnFileWatcherClick(object sender, RoutedEventArgs e)
         {
             ShowPage(FileWatcherPage);
-            PageTitle.Text = "📁 Dateiwächter";
+            PageTitle.Text = "📂 Dateiwächter";
+            BtnDashboard.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnProcesses.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnFileWatch.Foreground = System.Windows.Media.Brushes.White;
+            BtnInfo.Foreground = System.Windows.Media.Brushes.Gray;
         }
 
         private void OnInfoClick(object sender, RoutedEventArgs e)
         {
             ShowPage(InfoPage);
-            PageTitle.Text = "ℹ️ Info";
+            PageTitle.Text = "ℹ️ Information";
+            BtnDashboard.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnProcesses.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnFileWatch.Foreground = System.Windows.Media.Brushes.Gray;
+            BtnInfo.Foreground = System.Windows.Media.Brushes.White;
         }
 
-        private void ShowPage(Grid page)
+        private void ShowPage(UIElement page)
         {
             DashboardPage.Visibility = Visibility.Collapsed;
             ProcessesPage.Visibility = Visibility.Collapsed;
@@ -83,14 +126,55 @@ namespace KernelDash
             page.Visibility = Visibility.Visible;
         }
 
+        private void Button_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button btn && (System.Windows.Media.Brush)btn.Foreground == System.Windows.Media.Brushes.Gray)
+            {
+                btn.Foreground = System.Windows.Media.Brushes.LightGray;
+            }
+        }
+
+        private void Button_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button btn && (System.Windows.Media.Brush)btn.Foreground == System.Windows.Media.Brushes.LightGray)
+            {
+                btn.Foreground = System.Windows.Media.Brushes.Gray;
+            }
+        }
+
         // ===== DASHBOARD EVENTS =====
         private void UpdateHardwareInfo(double cpuUsage, long usedRam, long totalRam)
         {
             Dispatcher.Invoke(() =>
             {
                 CpuValue.Text = $"{cpuUsage:F1}%";
+                CpuProgress.Value = cpuUsage;
+                CpuState.Text = cpuUsage > 75 ? "🔴 Hoch" : cpuUsage > 50 ? "🟡 Mittel" : "🟢 Niedrig";
+
+                double ramPercent = (double)usedRam / totalRam * 100;
                 RamValue.Text = $"{FormatBytes(usedRam)} / {FormatBytes(totalRam)}";
+                RamProgress.Value = ramPercent;
+                RamPercent.Text = $"{ramPercent:F1}%";
+
+                ProcessCount.Text = Process.GetProcesses().Length.ToString();
+
+                // Update Uptime
+                TimeSpan uptime = DateTime.Now - _startTime;
+                UpTime.Text = $"{uptime.Days}d {uptime.Hours}h {uptime.Minutes}m";
             });
+        }
+
+        private void UpdateAllDashboardData()
+        {
+            try
+            {
+                LoadSystemInfo();
+                LoadDiskInfo();
+            }
+            catch (Exception ex)
+            {
+                // Silently handle
+            }
         }
 
         private void LoadSystemInfo()
@@ -98,70 +182,135 @@ namespace KernelDash
             try
             {
                 ComputerName.Text = Environment.MachineName;
-                OsInfo.Text = Environment.OSVersion.VersionString;
+                UserName.Text = Environment.UserName;
                 ProcessorCount.Text = Environment.ProcessorCount.ToString();
-                TotalRam.Text = FormatBytes(_systemMonitor.GetTotalRam());
+                OsInfo.Text = GetOperatingSystemName();
+                TotalRam.Text = FormatBytes(_systemMonitor.GetTotalPhysicalMemory());
+                Architecture.Text = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
+
+                // IP & MAC Adresse
+                try
+                {
+                    var hostEntry = Dns.GetHostEntry(Dns.GetHostName());
+                    var ipAddress = hostEntry.AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                    IpAddress.Text = ipAddress?.ToString() ?? "-";
+
+                    var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+                    var activeInterface = networkInterfaces.FirstOrDefault(ni => ni.OperationalStatus == OperationalStatus.Up);
+                    MacAddress.Text = activeInterface?.GetPhysicalAddress().ToString() ?? "-";
+
+                    var dnsAddresses = activeInterface?.GetIPProperties().DnsAddresses;
+                    DnsServer.Text = dnsAddresses?.FirstOrDefault()?.ToString() ?? "-";
+                }
+                catch { }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Fehler beim Laden der Systeminfo: {ex.Message}", "Fehler");
+                MessageBox.Show($"Error loading system info: {ex.Message}");
             }
         }
 
-        // ===== PROCESS MANAGEMENT EVENTS =====
-        private void OnRefreshProcesses(object? sender, RoutedEventArgs? e)
+        private void LoadDiskInfo()
+        {
+            try
+            {
+                var driveInfo = DriveInfo.GetDrives().FirstOrDefault(d => d.Name.StartsWith("C:"));
+                if (driveInfo != null)
+                {
+                    long usedSpace = driveInfo.TotalSize - driveInfo.AvailableFreeSpace;
+                    DiskValue.Text = $"{FormatBytes(usedSpace)} / {FormatBytes(driveInfo.TotalSize)}";
+                    DiskProgress.Value = (double)usedSpace / driveInfo.TotalSize * 100;
+                    DiskPercent.Text = $"{(double)usedSpace / driveInfo.TotalSize * 100:F1}%";
+                }
+            }
+            catch { }
+        }
+
+        private string GetOperatingSystemName()
+        {
+            try
+            {
+                var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem");
+                var osCollection = searcher.Get();
+                var osObject = osCollection.Cast<ManagementObject>().FirstOrDefault();
+                if (osObject != null)
+                {
+                    string caption = osObject["Caption"]?.ToString() ?? "-";
+                    string version = osObject["Version"]?.ToString() ?? "";
+                    return $"{caption} ({version})";
+                }
+            }
+            catch { }
+            return $"Windows {Environment.OSVersion.VersionString}";
+        }
+
+        private string FormatBytes(long bytes)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            double len = bytes;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len = len / 1024;
+            }
+            return $"{len:F1} {sizes[order]}";
+        }
+
+        // ===== PROCESS EVENTS =====
+        private void OnRefreshProcesses(object sender, RoutedEventArgs e)
         {
             try
             {
                 var processes = _processManager.GetAllProcesses();
                 ProcessGrid.ItemsSource = processes;
-                ProcessCount.Text = processes.Count.ToString();
+                ProcessCountLabel.Text = processes.Count.ToString();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Fehler beim Laden der Prozesse: {ex.Message}", "Fehler");
+                MessageBox.Show($"Fehler beim Aktualisieren: {ex.Message}");
             }
         }
 
         private void OnKillProcess(object sender, RoutedEventArgs e)
         {
-            if (ProcessGrid.SelectedItem is ProcessInfo process)
+            if (sender is System.Windows.Controls.Button btn && btn.Tag is int processId)
             {
-                var result = MessageBox.Show(
-                    $"Soll der Prozess '{process.ProcessName}' (PID: {process.ProcessId}) beendet werden?",
-                    "Bestätigung",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
+                if (MessageBox.Show($"Soll der Prozess wirklich beendet werden?", "Bestätigung", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     try
                     {
-                        _processManager.KillProcess(process.ProcessId);
-                        MessageBox.Show("Prozess erfolgreich beendet.", "Erfolg");
-                        OnRefreshProcesses(sender, e);
+                        _processManager.KillProcess(processId);
+                        OnRefreshProcesses(null, null);
+                        MessageBox.Show("Prozess beendet!", "Erfolg");
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Fehler beim Beenden des Prozesses: {ex.Message}", "Fehler");
+                        MessageBox.Show($"Fehler beim Beenden: {ex.Message}");
                     }
                 }
-            }
-            else
-            {
-                MessageBox.Show("Bitte wählen Sie einen Prozess aus.", "Information");
             }
         }
 
         // ===== FILE WATCHER EVENTS =====
+        private void OnFileWatcherEvent(string message)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                FileWatcherLog.Items.Insert(0, $"[{DateTime.Now:HH:mm:ss}] {message}");
+                if (FileWatcherLog.Items.Count > 1000)
+                {
+                    FileWatcherLog.Items.RemoveAt(FileWatcherLog.Items.Count - 1);
+                }
+            });
+        }
+
         private void OnBrowseFolder(object sender, RoutedEventArgs e)
         {
-            using (var dialog = new FolderBrowserDialog())
+            var dialog = new FolderBrowserDialog();
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    WatchPath.Text = dialog.SelectedPath;
-                }
+                WatchPath.Text = dialog.SelectedPath;
             }
         }
 
@@ -170,62 +319,24 @@ namespace KernelDash
             try
             {
                 string path = WatchPath.Text;
-
-                if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+                if (!Directory.Exists(path))
                 {
-                    MessageBox.Show("Bitte geben Sie einen gültigen Pfad ein.", "Fehler");
+                    MessageBox.Show("Pfad existiert nicht!");
                     return;
                 }
-
                 _fileWatcher.StartWatching(path);
-                MessageBox.Show($"Dateiwächter gestartet für:\n{path}", "Erfolg");
+                FileWatcherLog.Items.Insert(0, $"[{DateTime.Now:HH:mm:ss}] ✓ Überwachung gestartet: {path}");
+                MessageBox.Show("Überwachung gestartet!", "Info");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Fehler beim Starten des Dateiwächters: {ex.Message}", "Fehler");
+                MessageBox.Show($"Fehler: {ex.Message}");
             }
         }
 
         private void OnClearLog(object sender, RoutedEventArgs e)
         {
             FileWatcherLog.Items.Clear();
-        }
-
-        private void OnFileWatcherEvent(string message)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                FileWatcherLog.Items.Insert(0, $"[{DateTime.Now:HH:mm:ss}] {message}");
-                
-                // Limit to 1000 entries
-                while (FileWatcherLog.Items.Count > 1000)
-                {
-                    FileWatcherLog.Items.RemoveAt(FileWatcherLog.Items.Count - 1);
-                }
-            });
-        }
-
-        // ===== UTILITY =====
-        private string FormatBytes(long bytes)
-        {
-            string[] sizes = { "B", "KB", "MB", "GB" };
-            double len = bytes;
-            int order = 0;
-
-            while (len >= 1024 && order < sizes.Length - 1)
-            {
-                order++;
-                len /= 1024;
-            }
-
-            return $"{len:F2} {sizes[order]}";
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-            _systemMonitor.StopMonitoring();
-            _fileWatcher.StopWatching();
         }
     }
 }
