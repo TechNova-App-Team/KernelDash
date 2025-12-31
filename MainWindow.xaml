@@ -1,209 +1,170 @@
 <Window x:Class="KernelDash.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="KernelDash - System Manager" Height="900" Width="1800"
-        Background="#0f0f0f" WindowStartupLocation="CenterScreen" Foreground="#ffffff">
+        Title="KernelDash - System Manager" Height="1000" Width="2000"
+        Background="#0a0a0a" WindowStartupLocation="CenterScreen" Foreground="#ffffff">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="320"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- SIDEBAR NAVIGATION -->
-        <Border Grid.Column="0" Background="#1a1a1a" BorderBrush="#2a2a2a" BorderThickness="0,0,1,0">
+        <!-- SIDEBAR -->
+        <Border Grid.Column="0" Background="#121212" BorderBrush="#2a2a2a" BorderThickness="0,0,1,0">
             <StackPanel>
-                <TextBlock Text="KernelDash" Foreground="#ffffff" FontSize="28" FontWeight="Bold" Padding="30,35,30,5"/>
-                <TextBlock Text="System Manager" Foreground="#888888" FontSize="10" Padding="30,0,30,45" FontFamily="Courier New"/>
-                
+                <Border Background="#1a1a1a" Margin="0,0,0,20">
+                    <StackPanel Margin="30,40,30,50">
+                        <TextBlock Text="KernelDash" Foreground="#00ff88" FontSize="32" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock Text="System Manager v1.1" Foreground="#666666" FontSize="9" FontFamily="Courier New"/>
+                    </StackPanel>
+                </Border>
+
                 <Button x:Name="BtnDashboard" Content="📊 Dashboard" Foreground="#ffffff" Background="Transparent" 
                         BorderThickness="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" 
-                        Padding="30,20" FontSize="14" Click="OnDashboardClick" 
+                        Padding="30,18" FontSize="13" Click="OnDashboardClick" 
                         MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave"/>
                 
-                <Button x:Name="BtnProcesses" Content="⚙️  Prozesse" Foreground="#aaaaaa" Background="Transparent" 
+                <Button x:Name="BtnProcesses" Content="⚙️  Processes" Foreground="#888888" Background="Transparent" 
                         BorderThickness="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" 
-                        Padding="30,20" FontSize="14" Click="OnProcessesClick" 
+                        Padding="30,18" FontSize="13" Click="OnProcessesClick" 
                         MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave"/>
                 
-                <Button x:Name="BtnFileWatch" Content="📂 Dateiwächter" Foreground="#aaaaaa" Background="Transparent" 
+                <Button x:Name="BtnNetwork" Content="🌐 Network" Foreground="#888888" Background="Transparent" 
                         BorderThickness="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" 
-                        Padding="30,20" FontSize="14" Click="OnFileWatcherClick" 
+                        Padding="30,18" FontSize="13" Click="OnNetworkClick" 
                         MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave"/>
                 
-                <Button x:Name="BtnInfo" Content="ℹ️  Information" Foreground="#aaaaaa" Background="Transparent" 
+                <Button x:Name="BtnFileWatch" Content="📂 File Watcher" Foreground="#888888" Background="Transparent" 
                         BorderThickness="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" 
-                        Padding="30,20" FontSize="14" Click="OnInfoClick" 
+                        Padding="30,18" FontSize="13" Click="OnFileWatcherClick" 
+                        MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave"/>
+                
+                <Button x:Name="BtnInfo" Content="ℹ️  Information" Foreground="#888888" Background="Transparent" 
+                        BorderThickness="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" 
+                        Padding="30,18" FontSize="13" Click="OnInfoClick" 
                         MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave"/>
             </StackPanel>
         </Border>
 
-        <!-- MAIN CONTENT AREA -->
-        <Grid Grid.Column="1" Background="#0f0f0f">
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Column="1" Background="#0a0a0a">
             <Grid.RowDefinitions>
-                <RowDefinition Height="80"/>
+                <RowDefinition Height="90"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- TOP BAR WITH TITLE -->
-            <Border Grid.Row="0" Background="#1a1a1a" BorderBrush="#2a2a2a" BorderThickness="0,0,0,1">
-                <TextBlock x:Name="PageTitle" Text="Dashboard" Foreground="#ffffff" FontSize="32" FontWeight="Bold" 
-                           Padding="40,25,0,0" VerticalAlignment="Top"/>
+            <!-- TOP BAR -->
+            <Border Grid.Row="0" Background="#1a1a1a" BorderBrush="#2a2a2a" BorderThickness="0,0,0,1" Margin="40,0">
+                <Grid VerticalAlignment="Center">
+                    <TextBlock x:Name="PageTitle" Text="Dashboard" Foreground="#ffffff" FontSize="36" FontWeight="Bold"/>
+                    <TextBlock x:Name="PageSubtitle" Text="" Foreground="#666666" FontSize="12" HorizontalAlignment="Right" Margin="0,0,20,0"/>
+                </Grid>
             </Border>
 
-            <!-- SCROLLABLE CONTENT -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#0f0f0f">
-                <StackPanel x:Name="ContentPanel">
+            <!-- CONTENT -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#0a0a0a">
+                <StackPanel x:Name="ContentPanel" Margin="40,35,40,40">
                     
-                    <!-- ========== DASHBOARD PAGE ========== -->
-                    <StackPanel x:Name="DashboardPage" Margin="40,40,40,40">
-                        
-                        <!-- TOP METRICS ROW -->
+                    <!-- DASHBOARD -->
+                    <StackPanel x:Name="DashboardPage">
                         <Grid Margin="0,0,0,40">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-
-                            <!-- CPU METRIC -->
-                            <Border Grid.Column="0" Background="#1a1a1a" Padding="30" Margin="0,0,20,0" BorderBrush="#2a2a2a" BorderThickness="1">
-                                <StackPanel>
-                                    <TextBlock Text="CPU-AUSLASTUNG" Foreground="#777777" FontSize="11" FontWeight="Bold" Margin="0,0,0,15"/>
-                                    <TextBlock x:Name="CpuValue" Text="0%" Foreground="#ffffff" FontSize="48" FontWeight="Bold" Margin="0,0,0,10"/>
-                                    <ProgressBar x:Name="CpuProgress" Height="4" Background="#333333" Foreground="#4CAF50" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="CpuState" Text="Idle" Foreground="#666666" FontSize="10"/>
+                            
+                            <Border Grid.Column="0" Background="#1a1a1a" Margin="0,0,20,0" BorderBrush="#2a2a2a" BorderThickness="1">
+                                <StackPanel Margin="25">
+                                    <TextBlock Text="CPU" Foreground="#00ff88" FontSize="10" FontWeight="Bold" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="CpuValue" Text="0%" Foreground="#ffffff" FontSize="42" FontWeight="Bold" Margin="0,0,0,8"/>
+                                    <ProgressBar x:Name="CpuProgress" Height="5" Background="#222222" Foreground="#00ff88" Margin="0,0,0,8"/>
+                                    <TextBlock x:Name="CpuState" Text="🟢 Idle" Foreground="#666666" FontSize="9"/>
                                 </StackPanel>
                             </Border>
 
-                            <!-- RAM METRIC -->
-                            <Border Grid.Column="1" Background="#1a1a1a" Padding="30" Margin="0,0,20,0" BorderBrush="#2a2a2a" BorderThickness="1">
-                                <StackPanel>
-                                    <TextBlock Text="RAM-SPEICHER" Foreground="#777777" FontSize="11" FontWeight="Bold" Margin="0,0,0,15"/>
-                                    <TextBlock x:Name="RamValue" Text="0 GB / 0 GB" Foreground="#ffffff" FontSize="40" FontWeight="Bold" Margin="0,0,0,10"/>
-                                    <ProgressBar x:Name="RamProgress" Height="4" Background="#333333" Foreground="#2196F3" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="RamPercent" Text="0%" Foreground="#666666" FontSize="10"/>
+                            <Border Grid.Column="1" Background="#1a1a1a" Margin="0,0,20,0" BorderBrush="#2a2a2a" BorderThickness="1">
+                                <StackPanel Margin="25">
+                                    <TextBlock Text="RAM" Foreground="#00ccff" FontSize="10" FontWeight="Bold" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="RamValue" Text="0 / 0" Foreground="#ffffff" FontSize="36" FontWeight="Bold" Margin="0,0,0,8"/>
+                                    <ProgressBar x:Name="RamProgress" Height="5" Background="#222222" Foreground="#00ccff" Margin="0,0,0,8"/>
+                                    <TextBlock x:Name="RamPercent" Text="0%" Foreground="#666666" FontSize="9"/>
                                 </StackPanel>
                             </Border>
 
-                            <!-- DISK METRIC -->
-                            <Border Grid.Column="2" Background="#1a1a1a" Padding="30" Margin="0,0,20,0" BorderBrush="#2a2a2a" BorderThickness="1">
-                                <StackPanel>
-                                    <TextBlock Text="DISK C:" Foreground="#777777" FontSize="11" FontWeight="Bold" Margin="0,0,0,15"/>
-                                    <TextBlock x:Name="DiskValue" Text="0 GB / 0 GB" Foreground="#ffffff" FontSize="40" FontWeight="Bold" Margin="0,0,0,10"/>
-                                    <ProgressBar x:Name="DiskProgress" Height="4" Background="#333333" Foreground="#FF9800" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="DiskPercent" Text="0%" Foreground="#666666" FontSize="10"/>
+                            <Border Grid.Column="2" Background="#1a1a1a" Margin="0,0,20,0" BorderBrush="#2a2a2a" BorderThickness="1">
+                                <StackPanel Margin="25">
+                                    <TextBlock Text="DISK C:" Foreground="#ffaa00" FontSize="10" FontWeight="Bold" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="DiskValue" Text="0 / 0" Foreground="#ffffff" FontSize="36" FontWeight="Bold" Margin="0,0,0,8"/>
+                                    <ProgressBar x:Name="DiskProgress" Height="5" Background="#222222" Foreground="#ffaa00" Margin="0,0,0,8"/>
+                                    <TextBlock x:Name="DiskPercent" Text="0%" Foreground="#666666" FontSize="9"/>
                                 </StackPanel>
                             </Border>
 
-                            <!-- PROCESSES METRIC -->
-                            <Border Grid.Column="3" Background="#1a1a1a" Padding="30" BorderBrush="#2a2a2a" BorderThickness="1">
-                                <StackPanel>
-                                    <TextBlock Text="PROZESSE" Foreground="#777777" FontSize="11" FontWeight="Bold" Margin="0,0,0,15"/>
-                                    <TextBlock x:Name="ProcessCount" Text="0" Foreground="#ffffff" FontSize="48" FontWeight="Bold" Margin="0,0,0,10"/>
-                                    <TextBlock Text="laufende Programme" Foreground="#666666" FontSize="10"/>
+                            <Border Grid.Column="3" Background="#1a1a1a" BorderBrush="#2a2a2a" BorderThickness="1">
+                                <StackPanel Margin="25">
+                                    <TextBlock Text="PROCESSES" Foreground="#ff4488" FontSize="10" FontWeight="Bold" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="ProcessCount" Text="0" Foreground="#ffffff" FontSize="42" FontWeight="Bold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="running" Foreground="#666666" FontSize="9"/>
                                 </StackPanel>
                             </Border>
                         </Grid>
 
-                        <!-- SYSTEM INFO SECTION -->
-                        <Border Background="#1a1a1a" Padding="30" Margin="0,0,0,30" BorderBrush="#2a2a2a" BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="SYSTEMINFORMATIONEN" Foreground="#777777" FontSize="11" FontWeight="Bold" Margin="0,0,0,20"/>
+                        <Border Background="#1a1a1a" Margin="0,0,0,30" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="25">
+                                <TextBlock Text="SYSTEM INFORMATION" Foreground="#00ff88" FontSize="10" FontWeight="Bold" Margin="0,0,0,18"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- Row 1 -->
-                                    <TextBlock Text="Computername:" Foreground="#aaaaaa" FontSize="12" Margin="0,0,20,15"/>
-                                    <TextBlock x:Name="ComputerName" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="1" Margin="0,0,0,15"/>
-                                    <TextBlock Text="Benutzer:" Foreground="#aaaaaa" FontSize="12" Grid.Column="2" Margin="0,0,20,15"/>
-                                    <TextBlock x:Name="UserName" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="3" Margin="0,0,0,15"/>
-                                    <TextBlock Text="IP-Adresse:" Foreground="#aaaaaa" FontSize="12" Grid.Column="4" Margin="0,0,20,15"/>
-                                    <TextBlock x:Name="IpAddress" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="5" Margin="0,0,0,15"/>
+                                    <TextBlock Text="Computer:" Foreground="#888888" FontSize="11" Margin="0,0,15,12"/>
+                                    <TextBlock x:Name="ComputerName" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="1" Margin="0,0,0,12"/>
+                                    <TextBlock Text="User:" Foreground="#888888" FontSize="11" Grid.Column="2" Margin="0,0,15,12"/>
+                                    <TextBlock x:Name="UserName" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="3" Margin="0,0,0,12"/>
 
-                                    <!-- Row 2 -->
-                                    <TextBlock Text="Betriebssystem:" Foreground="#aaaaaa" FontSize="12" Grid.Row="1" Margin="0,0,20,15"/>
-                                    <TextBlock x:Name="OsInfo" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="1" Grid.Row="1" Margin="0,0,0,15"/>
-                                    <TextBlock Text="Uptime:" Foreground="#aaaaaa" FontSize="12" Grid.Column="2" Grid.Row="1" Margin="0,0,20,15"/>
-                                    <TextBlock x:Name="UpTime" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="3" Grid.Row="1" Margin="0,0,0,15"/>
-                                    <TextBlock Text="Kerne:" Foreground="#aaaaaa" FontSize="12" Grid.Column="4" Grid.Row="1" Margin="0,0,20,15"/>
-                                    <TextBlock x:Name="ProcessorCount" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="5" Grid.Row="1" Margin="0,0,0,15"/>
+                                    <TextBlock Text="OS:" Foreground="#888888" FontSize="11" Grid.Row="1" Margin="0,0,15,12"/>
+                                    <TextBlock x:Name="OsInfo" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="1" Grid.Row="1" Margin="0,0,0,12"/>
+                                    <TextBlock Text="Uptime:" Foreground="#888888" FontSize="11" Grid.Column="2" Grid.Row="1" Margin="0,0,15,12"/>
+                                    <TextBlock x:Name="UpTime" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="3" Grid.Row="1" Margin="0,0,0,12"/>
 
-                                    <!-- Row 3 -->
-                                    <TextBlock Text="RAM (Gesamt):" Foreground="#aaaaaa" FontSize="12" Grid.Row="2" Margin="0,0,20,0"/>
-                                    <TextBlock x:Name="TotalRam" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="1" Grid.Row="2"/>
-                                    <TextBlock Text="Systemarchitektur:" Foreground="#aaaaaa" FontSize="12" Grid.Column="2" Grid.Row="2" Margin="0,0,20,0"/>
-                                    <TextBlock x:Name="Architecture" Text="-" Foreground="#ffffff" FontSize="12" Grid.Column="3" Grid.Row="2"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- NETWORK INFO -->
-                        <Border Background="#1a1a1a" Padding="30" BorderBrush="#2a2a2a" BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="NETZWERK" Foreground="#777777" FontSize="11" FontWeight="Bold" Margin="0,0,0,15"/>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="MAC-Adresse:" Foreground="#aaaaaa" FontSize="11"/>
-                                    <TextBlock x:Name="MacAddress" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="1" Margin="15,0,0,0"/>
-                                    <TextBlock Text="DNS:" Foreground="#aaaaaa" FontSize="11" Grid.Column="2" Margin="40,0,0,0"/>
-                                    <TextBlock x:Name="DnsServer" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="3" Margin="15,0,0,0"/>
+                                    <TextBlock Text="RAM:" Foreground="#888888" FontSize="11" Grid.Row="2" Margin="0,0,15,0"/>
+                                    <TextBlock x:Name="TotalRam" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="1" Grid.Row="2"/>
+                                    <TextBlock Text="Cores:" Foreground="#888888" FontSize="11" Grid.Column="2" Grid.Row="2" Margin="0,0,15,0"/>
+                                    <TextBlock x:Name="ProcessorCount" Text="-" Foreground="#ffffff" FontSize="11" Grid.Column="3" Grid.Row="2"/>
                                 </Grid>
                             </StackPanel>
                         </Border>
                     </StackPanel>
 
-                    <!-- ========== PROCESSES PAGE ========== -->
-                    <StackPanel x:Name="ProcessesPage" Visibility="Collapsed" Margin="40,40,40,40">
-                        
-                        <!-- CONTROLS -->
-                        <Border Background="#1a1a1a" Padding="25" Margin="0,0,0,25" BorderBrush="#2a2a2a" BorderThickness="1">
-                            <StackPanel Orientation="Horizontal">
-                                <Button Content="🔄 Aktualisieren" Background="#333333" Foreground="#ffffff" Padding="15,12" 
-                                        FontSize="12" BorderThickness="0" Click="OnRefreshProcesses" Margin="0,0,20,0" 
-                                        Cursor="Hand"/>
-                                <TextBlock Text="Prozesse:" Foreground="#aaaaaa" FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBlock x:Name="ProcessCountLabel" Text="0" Foreground="#ffffff" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <!-- PROCESSES -->
+                    <StackPanel x:Name="ProcessesPage" Visibility="Collapsed">
+                        <Border Background="#1a1a1a" Margin="0,0,0,20" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="20">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="🔄 Refresh (F5)" Background="#00ff88" Foreground="#000000" Padding="12,10" FontSize="11" FontWeight="Bold" BorderThickness="0" Click="OnRefreshProcesses" Margin="0,0,20,0" Cursor="Hand"/>
+                                    <Button Content="📋 Details" Background="#00ccff" Foreground="#000000" Padding="12,10" FontSize="11" FontWeight="Bold" BorderThickness="0" Click="OnShowProcessDetails" Margin="0,0,20,0" Cursor="Hand"/>
+                                    <TextBlock Text="Total:" Foreground="#888888" FontSize="11" VerticalAlignment="Center" Margin="20,0,8,0"/>
+                                    <TextBlock x:Name="ProcessCountLabel" Text="0" Foreground="#00ff88" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 
-                        <!-- PROCESS LIST -->
-                        <ListBox x:Name="ProcessGrid" Background="#1a1a1a" Foreground="#cccccc" BorderThickness="1" 
-                                 BorderBrush="#2a2a2a" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,20" 
-                                 Height="550" Padding="0">
+                        <ListBox x:Name="ProcessGrid" Background="#1a1a1a" Foreground="#cccccc" BorderThickness="1" BorderBrush="#2a2a2a" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,20" Height="600">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="Transparent" Padding="20,12" Margin="0,0,0,0" BorderBrush="#2a2a2a" BorderThickness="0,0,0,1">
+                                    <Border Background="Transparent" Padding="15" Margin="0,0,0,0" BorderBrush="#222222" BorderThickness="0,0,0,1">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
-                                                <ColumnDefinition Width="220"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="120"/>
+                                                <ColumnDefinition Width="70"/><ColumnDefinition Width="200"/><ColumnDefinition Width="120"/><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/><ColumnDefinition Width="110"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding ProcessId}" Foreground="#888888" FontSize="11" FontFamily="Courier New"/>
-                                            <TextBlock Text="{Binding ProcessName}" Foreground="#ffffff" FontSize="11" FontWeight="Bold" Grid.Column="1" Margin="15,0,0,0"/>
-                                            <TextBlock Text="{Binding FilePath}" Foreground="#555555" FontSize="10" Grid.Column="2" Margin="15,0,0,0" TextTrimming="CharacterEllipsis"/>
-                                            <Button Content="✕ KILL" Background="#c41e3a" Foreground="white" Padding="10,5" 
-                                                    FontSize="10" BorderThickness="0" Grid.Column="3" Margin="15,0,0,0" 
-                                                    Click="OnKillProcess" Tag="{Binding ProcessId}" Cursor="Hand"/>
+                                            <TextBlock Text="{Binding ProcessId}" Foreground="#00ccff" FontSize="10" FontFamily="Courier New" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding ProcessName}" Foreground="#00ff88" FontSize="11" FontWeight="Bold" Grid.Column="1" Margin="15,0,0,0"/>
+                                            <TextBlock Text="{Binding CpuUsage, StringFormat='CPU: {0:F1}%'}" Foreground="#ffaa00" FontSize="9" Grid.Column="2" Margin="15,0,0,0"/>
+                                            <TextBlock Text="{Binding MemoryMB, StringFormat='RAM: {0} MB'}" Foreground="#00ccff" FontSize="9" Grid.Column="3" Margin="15,0,0,0"/>
+                                            <TextBlock Text="{Binding FilePath}" Foreground="#555555" FontSize="9" Grid.Column="4" Margin="15,0,0,0" TextTrimming="CharacterEllipsis"/>
+                                            <Button Content="✕ KILL" Background="#ff4488" Foreground="white" Padding="8,5" FontSize="9" FontWeight="Bold" BorderThickness="0" Grid.Column="5" Margin="15,0,0,0" Click="OnKillProcess" Tag="{Binding ProcessId}" Cursor="Hand"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -211,65 +172,136 @@
                         </ListBox>
                     </StackPanel>
 
-                    <!-- ========== FILE WATCHER PAGE ========== -->
-                    <StackPanel x:Name="FileWatcherPage" Visibility="Collapsed" Margin="40,40,40,40">
-                        
-                        <!-- PATH SELECTOR -->
-                        <Border Background="#1a1a1a" Padding="25" Margin="0,0,0,25" BorderBrush="#2a2a2a" BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="ÜBERWACHTER PFAD" Foreground="#777777" FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
+                    <!-- NETWORK -->
+                    <StackPanel x:Name="NetworkPage" Visibility="Collapsed">
+                        <Border Background="#1a1a1a" Margin="0,0,0,25" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="25">
+                                <TextBlock Text="NETWORK ADAPTERS" Foreground="#00ff88" FontSize="10" FontWeight="Bold" Margin="0,0,0,18"/>
+                                <ListBox x:Name="NetworkAdapters" Background="Transparent" Foreground="#cccccc" BorderThickness="0" Height="200">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#0f0f0f" Padding="12" Margin="0,0,0,8" BorderBrush="#222222" BorderThickness="1">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Name}" Foreground="#00ff88" FontSize="11" FontWeight="Bold" Margin="0,0,0,4"/>
+                                                    <TextBlock Text="{Binding Status, StringFormat='Status: {0}'}" Foreground="#888888" FontSize="9" Margin="0,0,0,4"/>
+                                                    <TextBlock Text="{Binding IpAddress, StringFormat='IP: {0}'}" Foreground="#00ccff" FontSize="9" Margin="0,0,0,4"/>
+                                                    <TextBlock Text="{Binding Gateway, StringFormat='Gateway: {0}'}" Foreground="#666666" FontSize="9" Margin="0,0,0,4"/>
+                                                    <TextBlock Text="{Binding DnsServers, StringFormat='DNS: {0}'}" Foreground="#666666" FontSize="9"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#1a1a1a" Margin="0,0,0,25" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="25">
+                                <TextBlock Text="NETWORK STATISTICS" Foreground="#00ccff" FontSize="10" FontWeight="Bold" Margin="0,0,0,18"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBox x:Name="WatchPath" Background="#0f0f0f" Foreground="#ffffff" Padding="12,10" 
-                                             Text="C:\Users" BorderThickness="1" BorderBrush="#333333" FontSize="11"
-                                            />
-                                    <Button Content="📁" Background="#333333" Foreground="#ffffff" Padding="12,10" 
-                                            FontSize="12" BorderThickness="0" Grid.Column="1" Margin="10,0,10,0" 
-                                            Click="OnBrowseFolder" Cursor="Hand" Width="45"/>
-                                    <Button Content="▶ START" Background="#1e90ff" Foreground="white" Padding="12,10" 
-                                            FontSize="11" BorderThickness="0" Grid.Column="2" Click="OnStartWatcher" 
-                                            Width="110" Cursor="Hand"/>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,20,15">
+                                        <TextBlock Text="Packets Sent" Foreground="#666666" FontSize="9" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="PacketsSent" Text="0" Foreground="#00ff88" FontSize="18" FontWeight="Bold"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,20,15">
+                                        <TextBlock Text="Packets Recv" Foreground="#666666" FontSize="9" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="PacketsReceived" Text="0" Foreground="#00ccff" FontSize="18" FontWeight="Bold"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Grid.Row="0">
+                                        <TextBlock Text="Errors" Foreground="#666666" FontSize="9" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="NetworkErrors" Text="0" Foreground="#ff4488" FontSize="18" FontWeight="Bold"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,0,20,0">
+                                        <TextBlock Text="Bytes Sent" Foreground="#666666" FontSize="9" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="BytesSent" Text="0 B" Foreground="#00ff88" FontSize="14" FontWeight="Bold"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,20,0">
+                                        <TextBlock Text="Bytes Recv" Foreground="#666666" FontSize="9" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="BytesReceived" Text="0 B" Foreground="#00ccff" FontSize="14" FontWeight="Bold"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Grid.Row="1">
+                                        <TextBlock Text="Inbound Drop" Foreground="#666666" FontSize="9" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="InboundDropped" Text="0" Foreground="#ffaa00" FontSize="14" FontWeight="Bold"/>
+                                    </StackPanel>
                                 </Grid>
                             </StackPanel>
                         </Border>
 
-                        <!-- CLEAR LOG BUTTON -->
-                        <Border Background="#1a1a1a" Padding="25" Margin="0,0,0,25" BorderBrush="#2a2a2a" BorderThickness="1">
-                            <Button Content="🗑️ Log löschen" Background="#333333" Foreground="#ffffff" Padding="12,8" 
-                                    FontSize="11" BorderThickness="0" Click="OnClearLog" Width="120" 
-                                    Cursor="Hand"/>
-                        </Border>
-
-                        <!-- LOG DISPLAY -->
-                        <Border Background="#1a1a1a" Padding="20" Height="480" Margin="0,0,0,20" BorderBrush="#2a2a2a" BorderThickness="1">
-                            <ListBox x:Name="FileWatcherLog" Background="Transparent" Foreground="#888888" 
-                                     BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                     FontSize="10" FontFamily="Courier New" Padding="0"/>
+                        <Border Background="#1a1a1a" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="25">
+                                <TextBlock Text="ACTIVE CONNECTIONS" Foreground="#ffaa00" FontSize="10" FontWeight="Bold" Margin="0,0,0,12"/>
+                                <ListBox x:Name="ActiveConnections" Background="Transparent" Foreground="#cccccc" BorderThickness="0" Height="200">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#0f0f0f" Padding="10" Margin="0,0,0,6" BorderBrush="#222222" BorderThickness="1">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding LocalAddress}" Foreground="#00ccff" FontSize="9" FontFamily="Courier New" Width="140"/>
+                                                    <TextBlock Text="→" Foreground="#666666" FontSize="9" Margin="5,0"/>
+                                                    <TextBlock Text="{Binding RemoteAddress}" Foreground="#00ff88" FontSize="9" FontFamily="Courier New" Width="140"/>
+                                                    <TextBlock Text="{Binding State}" Foreground="#ffaa00" FontSize="9" Margin="20,0,0,0" FontWeight="Bold"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
                         </Border>
                     </StackPanel>
 
-                    <!-- ========== INFO PAGE ========== -->
-                    <StackPanel x:Name="InfoPage" Visibility="Collapsed" Margin="40,40,40,40">
-                        
-                        <Border Background="#1a1a1a" Padding="40" Margin="0,0,0,25" BorderBrush="#2a2a2a" BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="KernelDash v1.0.0" Foreground="#ffffff" FontSize="36" FontWeight="Bold" Margin="0,0,0,15"/>
-                                <TextBlock Text="Modern System Manager Dashboard für Windows" Foreground="#888888" FontSize="13" Margin="0,0,0,35"/>
+                    <!-- FILE WATCHER -->
+                    <StackPanel x:Name="FileWatcherPage" Visibility="Collapsed">
+                        <Border Background="#1a1a1a" Margin="0,0,0,20" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="20">
+                                <TextBlock Text="WATCHED PATH" Foreground="#00ff88" FontSize="10" FontWeight="Bold" Margin="0,0,0,12"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="WatchPath" Background="#0f0f0f" Foreground="#ffffff" Padding="12,10" Text="C:\Users" BorderThickness="1" BorderBrush="#2a2a2a" FontSize="11"/>
+                                    <Button Content="📁" Background="#00ccff" Foreground="#000000" Padding="12,10" FontSize="12" FontWeight="Bold" BorderThickness="0" Grid.Column="1" Margin="10,0,10,0" Click="OnBrowseFolder" Cursor="Hand" Width="40"/>
+                                    <Button Content="▶ START" Background="#00ff88" Foreground="#000000" Padding="12,10" FontSize="11" FontWeight="Bold" BorderThickness="0" Grid.Column="2" Click="OnStartWatcher" Width="100" Cursor="Hand"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#1a1a1a" Margin="0,0,0,20" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="15">
+                                <Button Content="🗑️ Clear Log" Background="#ff4488" Foreground="white" Padding="10,8" FontSize="11" FontWeight="Bold" BorderThickness="0" Click="OnClearLog" Width="120" Cursor="Hand"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#1a1a1a" Padding="15" Height="400" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <ListBox x:Name="FileWatcherLog" Background="Transparent" Foreground="#888888" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto" FontSize="10" FontFamily="Courier New" Padding="0"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- INFO -->
+                    <StackPanel x:Name="InfoPage" Visibility="Collapsed">
+                        <Border Background="#1a1a1a" BorderBrush="#2a2a2a" BorderThickness="1">
+                            <StackPanel Margin="30">
+                                <TextBlock Text="KernelDash v1.1" Foreground="#00ff88" FontSize="32" FontWeight="Bold" Margin="0,0,0,12"/>
+                                <TextBlock Text="Advanced System Manager Dashboard" Foreground="#666666" FontSize="12" Margin="0,0,0,30"/>
                                 
-                                <TextBlock Text="Features" Foreground="#ffffff" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
-                                <TextBlock Text="✓ Echtzeit CPU, RAM, Disk Monitoring" Foreground="#aaaaaa" FontSize="11" Margin="0,0,0,8"/>
-                                <TextBlock Text="✓ Prozess-Manager mit Kill-Funktion" Foreground="#aaaaaa" FontSize="11" Margin="0,0,0,8"/>
-                                <TextBlock Text="✓ Live Dateisystem-Watcher mit Logging" Foreground="#aaaaaa" FontSize="11" Margin="0,0,0,8"/>
-                                <TextBlock Text="✓ Umfassende Systeminformationen" Foreground="#aaaaaa" FontSize="11" Margin="0,0,0,8"/>
-                                <TextBlock Text="✓ Netzwerk- und IP-Informationen" Foreground="#aaaaaa" FontSize="11" Margin="0,0,0,8"/>
-                                <TextBlock Text="✓ System Uptime Tracking" Foreground="#aaaaaa" FontSize="11" Margin="0,0,0,35"/>
+                                <TextBlock Text="Features" Foreground="#ffffff" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
+                                <TextBlock Text="✓ Real-time CPU, RAM, Disk monitoring" Foreground="#888888" FontSize="11" Margin="0,0,0,6"/>
+                                <TextBlock Text="✓ Advanced Process Manager with CPU/RAM per process" Foreground="#888888" FontSize="11" Margin="0,0,0,6"/>
+                                <TextBlock Text="✓ Network Adapter &amp; Connection monitoring" Foreground="#888888" FontSize="11" Margin="0,0,0,6"/>
+                                <TextBlock Text="✓ File System Watcher with real-time logging" Foreground="#888888" FontSize="11" Margin="0,0,0,30"/>
                                 
-                                <TextBlock Text="Tastenkürzel" Foreground="#ffffff" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
-                                <TextBlock Text="F5 = Prozesse aktualisieren | ESC = Anwendung beenden" Foreground="#777777" FontSize="10" FontFamily="Courier New"/>
+                                <TextBlock Text="Keyboard Shortcuts" Foreground="#ffffff" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
+                                <TextBlock Text="F5 = Refresh Processes | ESC = Exit" Foreground="#666666" FontSize="10" FontFamily="Courier New"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -278,3 +310,4 @@
         </Grid>
     </Grid>
 </Window>
+
