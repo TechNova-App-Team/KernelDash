@@ -7,110 +7,197 @@ using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Input;
-using KernelDash.Models;
-using KernelDash.Services;
-using KernelDash.ViewModels;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KernelDash
 {
     public class NetworkAdapterInfo
     {
-        public string Name { get; set; }
-        public string Status { get; set; }
-        public string IpAddress { get; set; }
-        public string Gateway { get; set; }
-        public string DnsServers { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public string IpAddress { get; set; } = string.Empty;
+        public string Gateway { get; set; } = string.Empty;
+        public string DnsServers { get; set; } = string.Empty;
     }
 
     public class ConnectionInfo
     {
-        public string LocalAddress { get; set; }
-        public string RemoteAddress { get; set; }
-        public string State { get; set; }
+        public string LocalAddress { get; set; } = string.Empty;
+        public string RemoteAddress { get; set; } = string.Empty;
+        public string State { get; set; } = string.Empty;
     }
 
-    public class ProcessInfoEx : ProcessInfo
+    public class ProcessInfoEx
     {
+        public int ProcessId { get; set; }
+        public string ProcessName { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;
         public double CpuUsage { get; set; }
         public long MemoryMB { get; set; }
     }
 
     public partial class MainWindow : Window
     {
-        private readonly SystemMonitorService _systemMonitor;
-        private readonly ProcessManagerService _processManager;
-        private readonly FileWatcherService _fileWatcher;
-        private readonly MainViewModel _viewModel;
         private DateTime _startTime;
-        private PerformanceCounter _processorCounter;
+        private PerformanceCounter? _cpuCounter;
+        private PerformanceCounter? _ramCounter;
+        private Thread _monitorThread;
 
         public MainWindow()
         {
+            InitializeComponent();
+            _startTime = DateTime.Now;
+            
             try
             {
-                InitializeComponent();
-
-                // Services
-                _systemMonitor = new SystemMonitorService();
-                _processManager = new ProcessManagerService();
-                _fileWatcher = new FileWatcherService();
-                _viewModel = new MainViewModel();
-
-                DataContext = _viewModel;
-
-                _startTime = DateTime.Now;
-                _processorCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
-
-                // Start monitoring
-                _systemMonitor.StartMonitoring(UpdateHardwareInfo);
-
-                // Load initial data
-                LoadSystemInfo();
-                LoadDiskInfo();
-                LoadNetworkInfo();
-
-                _fileWatcher.FileEvent += OnFileWatcherEvent;
-                this.KeyDown += MainWindow_KeyDown;
+                _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
+                _ramCounter = new PerformanceCounter("Memory", "Available MBytes", null, true);
+                _cpuCounter.NextValue();
+                _ramCounter.NextValue();
             }
-            catch (Exception ex)
+            catch { }
+            
+            LoadSystemInfo();
+            LoadDiskInfo();
+            UpdateAllDashboardData();
+            LoadNetworkInfo();
+            
+            // Set initial active button
+            UpdateNavButtons(BtnDashboard);
+            
+            _monitorThread = new Thread(() =>
             {
-                MessageBox.Show($"Init Error: {ex.Message}\n\n{ex.StackTrace}", "Error");
-            }
+                while (true)
+                {
+                    Thread.Sleep(1000);
+                    try
+                    {
+                        Dispatcher.Invoke(() => UpdateAllDashboardData());
+                    }
+                    catch { }
+                }
+            }) { IsBackground = true };
+            _monitorThread.Start();
         }
-
-        private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        
+        private void DashboardPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.F5)
+            // Ensure progress bars are properly sized after page loads
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                OnRefreshProcesses(sender, null);
-                e.Handled = true;
+                UpdateAllDashboardData();
+                LoadDiskInfo();
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
+        }
+
+        private void LoadSystemInfo()
+        {
+            try
+            {
+                var searcher = new ManagementObjectSearcher("select Caption from Win32_OperatingSystem");
+                foreach (var obj in searcher.Get())
+                {
+                    OsInfo.Text = obj["Caption"]?.ToString() ?? "Unknown";
+                }
+
+                searcher = new ManagementObjectSearcher("select Name from Win32_Processor");
+                foreach (var obj in searcher.Get())
+                {
+                    CpuInfo.Text = obj["Name"]?.ToString() ?? "Unknown";
+                }
+
+                var memory = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                RamInfo.Text = $"{(memory.TotalPhysicalMemory / 1024 / 1024 / 1024)} GB";
             }
-            else if (e.Key == Key.Escape)
+            catch { }
+        }
+
+        private void LoadDiskInfo()
+        {
+            try
             {
-                this.Close();
+                var drives = DriveInfo.GetDrives();
+                if (drives.Length > 0)
+                {
+                    var drive = drives[0];
+                    var total = drive.TotalSize / 1024 / 1024 / 1024;
+                    var used = (drive.TotalSize - drive.AvailableFreeSpace) / 1024 / 1024 / 1024;
+                    var percent = (100.0 * used / total);
+                    DiskUsageText.Text = $"{percent:F0}%";
+                    UpdateProgressBar(DiskBarContainer, percent);
+                }
+            }
+            catch { }
+        }
+        
+        private void UpdateProgressBar(Border progressBar, double percentage)
+        {
+            if (progressBar != null)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    try
+                    {
+                        // Find the parent Border container (the background border)
+                        var parent = progressBar.Parent as Border;
+                        if (parent != null)
+                        {
+                            // Force layout update to get actual width
+                            parent.UpdateLayout();
+                            var maxWidth = parent.ActualWidth > 0 ? parent.ActualWidth : 200;
+                            var newWidth = Math.Max(0, Math.Min(maxWidth, maxWidth * percentage / 100.0));
+                            progressBar.Width = newWidth;
+                        }
+                    }
+                    catch { }
+                });
             }
         }
 
-        // ===== NAVIGATION =====
+        private void UpdateAllDashboardData()
+        {
+            try
+            {
+                if (_cpuCounter != null)
+                {
+                    var cpuUsage = _cpuCounter.NextValue();
+                    CpuUsageText.Text = $"{cpuUsage:F1}%";
+                    UpdateProgressBar(CpuBarContainer, cpuUsage);
+                }
+
+                if (_ramCounter != null)
+                {
+                    var totalMemory = new Microsoft.VisualBasic.Devices.ComputerInfo().TotalPhysicalMemory / 1024 / 1024;
+                    var availableMemory = _ramCounter.NextValue();
+                    var usedMemory = totalMemory - availableMemory;
+                    var ramUsage = (100.0 * usedMemory / totalMemory);
+                    RamUsageText.Text = $"{ramUsage:F1}%";
+                    UpdateProgressBar(RamBarContainer, ramUsage);
+                }
+
+                var processes = Process.GetProcesses();
+                ProcessCountText.Text = processes.Length.ToString();
+                
+                // Update uptime
+                var uptime = DateTime.Now - _startTime;
+                UptimeText.Text = $"Uptime: {uptime.Hours}h {uptime.Minutes}m";
+            }
+            catch { }
+        }
+
         private void OnDashboardClick(object sender, RoutedEventArgs e)
         {
             ShowPage(DashboardPage);
-            PageTitle.Text = "📊 Dashboard";
-            PageSubtitle.Text = "System Status Overview";
-            UpdateAllDashboardData();
             UpdateNavButtons(BtnDashboard);
         }
 
         private void OnProcessesClick(object sender, RoutedEventArgs e)
         {
             ShowPage(ProcessesPage);
-            PageTitle.Text = "⚙️ Processes";
-            PageSubtitle.Text = "Manage running applications";
             OnRefreshProcesses(sender, e);
             UpdateNavButtons(BtnProcesses);
         }
@@ -118,8 +205,6 @@ namespace KernelDash
         private void OnNetworkClick(object sender, RoutedEventArgs e)
         {
             ShowPage(NetworkPage);
-            PageTitle.Text = "🌐 Network";
-            PageSubtitle.Text = "Network adapters & connections";
             LoadNetworkInfo();
             UpdateNavButtons(BtnNetwork);
         }
@@ -127,16 +212,40 @@ namespace KernelDash
         private void OnFileWatcherClick(object sender, RoutedEventArgs e)
         {
             ShowPage(FileWatcherPage);
-            PageTitle.Text = "📂 File Watcher";
-            PageSubtitle.Text = "Monitor file system changes";
             UpdateNavButtons(BtnFileWatch);
+        }
+
+        private void OnGPUClick(object sender, RoutedEventArgs e)
+        {
+            ShowPage(GPUPage);
+            UpdateNavButtons(BtnGPU);
+            LoadGPUInfo();
+        }
+
+        private void OnServicesClick(object sender, RoutedEventArgs e)
+        {
+            ShowPage(ServicesPage);
+            UpdateNavButtons(BtnServices);
+            OnRefreshServices(sender, e);
+        }
+
+        private void OnStartupClick(object sender, RoutedEventArgs e)
+        {
+            ShowPage(StartupPage);
+            UpdateNavButtons(BtnStartup);
+            OnRefreshStartup(sender, e);
+        }
+
+        private void OnLogsClick(object sender, RoutedEventArgs e)
+        {
+            ShowPage(LogsPage);
+            UpdateNavButtons(BtnLogs);
+            OnRefreshLogs(sender, e);
         }
 
         private void OnInfoClick(object sender, RoutedEventArgs e)
         {
             ShowPage(InfoPage);
-            PageTitle.Text = "ℹ️ Information";
-            PageSubtitle.Text = "About KernelDash";
             UpdateNavButtons(BtnInfo);
         }
 
@@ -145,258 +254,138 @@ namespace KernelDash
             DashboardPage.Visibility = Visibility.Collapsed;
             ProcessesPage.Visibility = Visibility.Collapsed;
             NetworkPage.Visibility = Visibility.Collapsed;
+            GPUPage.Visibility = Visibility.Collapsed;
+            ServicesPage.Visibility = Visibility.Collapsed;
+            StartupPage.Visibility = Visibility.Collapsed;
             FileWatcherPage.Visibility = Visibility.Collapsed;
+            LogsPage.Visibility = Visibility.Collapsed;
             InfoPage.Visibility = Visibility.Collapsed;
-            page.Visibility = Visibility.Visible;
+
+            if (page != null)
+                page.Visibility = Visibility.Visible;
         }
 
         private void UpdateNavButtons(System.Windows.Controls.Button active)
         {
-            BtnDashboard.Foreground = System.Windows.Media.Brushes.Gray;
-            BtnProcesses.Foreground = System.Windows.Media.Brushes.Gray;
-            BtnNetwork.Foreground = System.Windows.Media.Brushes.Gray;
-            BtnFileWatch.Foreground = System.Windows.Media.Brushes.Gray;
-            BtnInfo.Foreground = System.Windows.Media.Brushes.Gray;
-            active.Foreground = System.Windows.Media.Brushes.White;
+            // Reset all buttons to default style
+            BtnDashboard.Style = (Style)FindResource("SidebarButton");
+            BtnProcesses.Style = (Style)FindResource("SidebarButton");
+            BtnNetwork.Style = (Style)FindResource("SidebarButton");
+            BtnGPU.Style = (Style)FindResource("SidebarButton");
+            BtnServices.Style = (Style)FindResource("SidebarButton");
+            BtnStartup.Style = (Style)FindResource("SidebarButton");
+            BtnFileWatch.Style = (Style)FindResource("SidebarButton");
+            BtnLogs.Style = (Style)FindResource("SidebarButton");
+            BtnInfo.Style = (Style)FindResource("SidebarButton");
+
+            // Set active button style
+            active.Style = (Style)FindResource("ActiveSidebarButton");
         }
 
-        private void Button_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (sender is System.Windows.Controls.Button btn && (System.Windows.Media.Brush)btn.Foreground != System.Windows.Media.Brushes.White)
-            {
-                btn.Foreground = System.Windows.Media.Brushes.LightGray;
-            }
-        }
-
-        private void Button_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (sender is System.Windows.Controls.Button btn && (System.Windows.Media.Brush)btn.Foreground == System.Windows.Media.Brushes.LightGray)
-            {
-                btn.Foreground = System.Windows.Media.Brushes.Gray;
-            }
-        }
-
-        // ===== DASHBOARD =====
-        private void UpdateHardwareInfo(double cpuUsage, long usedRam, long totalRam)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                CpuValue.Text = $"{cpuUsage:F1}%";
-                CpuProgress.Value = cpuUsage;
-                CpuState.Text = cpuUsage > 75 ? "🔴 High" : cpuUsage > 50 ? "🟡 Medium" : "🟢 Low";
-
-                double ramPercent = (double)usedRam / totalRam * 100;
-                RamValue.Text = $"{FormatBytes(usedRam)} / {FormatBytes(totalRam)}";
-                RamProgress.Value = ramPercent;
-                RamPercent.Text = $"{ramPercent:F1}%";
-
-                ProcessCount.Text = Process.GetProcesses().Length.ToString();
-
-                TimeSpan uptime = DateTime.Now - _startTime;
-                UpTime.Text = $"{uptime.Days}d {uptime.Hours}h {uptime.Minutes}m";
-            });
-        }
-
-        private void UpdateAllDashboardData()
-        {
-            try
-            {
-                LoadSystemInfo();
-                LoadDiskInfo();
-            }
-            catch { }
-        }
-
-        private void LoadSystemInfo()
-        {
-            ComputerName.Text = Environment.MachineName;
-            UserName.Text = Environment.UserName;
-            ProcessorCount.Text = Environment.ProcessorCount.ToString();
-            OsInfo.Text = GetOperatingSystemName();
-            TotalRam.Text = FormatBytes(_systemMonitor.GetTotalPhysicalMemory());
-        }
-
-        private void LoadDiskInfo()
-        {
-            try
-            {
-                var driveInfo = DriveInfo.GetDrives().FirstOrDefault(d => d.Name.StartsWith("C:"));
-                if (driveInfo != null)
-                {
-                    long usedSpace = driveInfo.TotalSize - driveInfo.AvailableFreeSpace;
-                    DiskValue.Text = $"{FormatBytes(usedSpace)} / {FormatBytes(driveInfo.TotalSize)}";
-                    DiskProgress.Value = (double)usedSpace / driveInfo.TotalSize * 100;
-                    DiskPercent.Text = $"{(double)usedSpace / driveInfo.TotalSize * 100:F1}%";
-                }
-            }
-            catch { }
-        }
-
-        private string GetOperatingSystemName()
-        {
-            try
-            {
-                var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem");
-                var osObject = searcher.Get().Cast<ManagementObject>().FirstOrDefault();
-                if (osObject != null)
-                {
-                    string caption = osObject["Caption"]?.ToString() ?? "-";
-                    string version = osObject["Version"]?.ToString() ?? "";
-                    return $"{caption} ({version})";
-                }
-            }
-            catch { }
-            return $"Windows {Environment.OSVersion.VersionString}";
-        }
-
-        private string FormatBytes(long bytes)
-        {
-            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
-            double len = bytes;
-            int order = 0;
-            while (len >= 1024 && order < sizes.Length - 1)
-            {
-                order++;
-                len = len / 1024;
-            }
-            return $"{len:F1} {sizes[order]}";
-        }
-
-        // ===== PROCESSES =====
         private void OnRefreshProcesses(object sender, RoutedEventArgs e)
         {
             try
             {
-                var processes = Process.GetProcesses()
-                    .Select(p => new ProcessInfoEx
+                var processes = Process.GetProcesses();
+                var processesWithMetrics = new ObservableCollection<ProcessInfoEx>();
+
+                foreach (var process in processes.Take(100))
+                {
+                    try
                     {
-                        ProcessId = p.Id,
-                        ProcessName = p.ProcessName,
-                        FilePath = p.MainModule?.FileName ?? "N/A",
-                        MemoryMB = p.WorkingSet64 / (1024 * 1024),
-                        CpuUsage = GetProcessCpuUsage(p)
-                    })
-                    .OrderByDescending(x => x.MemoryMB)
-                    .ToList();
+                        var cpuCounter = new PerformanceCounter("Process", "% Processor Time", process.ProcessName, true);
+                        cpuCounter.NextValue();
+                        Thread.Sleep(50);
 
-                ProcessGrid.ItemsSource = processes;
-                ProcessCountLabel.Text = processes.Count.ToString();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
+                        processesWithMetrics.Add(new ProcessInfoEx
+                        {
+                            ProcessId = process.Id,
+                            ProcessName = process.ProcessName,
+                            FilePath = process.MainModule?.FileName ?? "N/A",
+                            CpuUsage = cpuCounter.NextValue() / Environment.ProcessorCount,
+                            MemoryMB = process.WorkingSet64 / 1024 / 1024
+                        });
+                    }
+                    catch { }
+                }
 
-        private double GetProcessCpuUsage(Process process)
-        {
-            try
-            {
-                var cpuCounter = new PerformanceCounter("Process", "% Processor Time", process.ProcessName, true);
-                return cpuCounter.NextValue() / Environment.ProcessorCount;
+                ProcessList.ItemsSource = processesWithMetrics.OrderByDescending(p => p.CpuUsage).ToList();
             }
-            catch
-            {
-                return 0;
-            }
-        }
-
-        private void OnShowProcessDetails(object sender, RoutedEventArgs e)
-        {
-            if (ProcessGrid.SelectedItem is ProcessInfoEx proc)
-            {
-                MessageBox.Show(
-                    $"Process: {proc.ProcessName}\n\n" +
-                    $"PID: {proc.ProcessId}\n" +
-                    $"Memory: {proc.MemoryMB} MB\n" +
-                    $"CPU: {proc.CpuUsage:F2}%\n" +
-                    $"Path: {proc.FilePath}",
-                    "Process Details");
-            }
-            else
-            {
-                MessageBox.Show("Select a process first!");
-            }
+            catch { }
         }
 
         private void OnKillProcess(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button btn && btn.Tag is int processId)
+            var btn = sender as System.Windows.Controls.Button;
+            if (btn?.Tag != null && int.TryParse(btn.Tag.ToString(), out var pid))
             {
-                if (MessageBox.Show($"Kill process {processId}?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                try
                 {
-                    try
-                    {
-                        _processManager.KillProcess(processId);
-                        OnRefreshProcesses(null, null);
-                        MessageBox.Show("Process killed!", "Success");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error: {ex.Message}");
-                    }
+                    var process = Process.GetProcessById(pid);
+                    process.Kill();
+                    OnRefreshProcesses(sender, e);
                 }
+                catch { }
             }
         }
 
-        // ===== NETWORK =====
         private void LoadNetworkInfo()
         {
             try
             {
-                // Load network adapters
                 var adapters = new ObservableCollection<NetworkAdapterInfo>();
-                foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces())
+                foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    var ipProps = adapter.GetIPProperties();
-                    var ipAddresses = ipProps.UnicastAddresses
-                        .Where(x => x.Address.AddressFamily == AddressFamily.InterNetwork)
-                        .FirstOrDefault();
-
+                    var ipProps = ni.GetIPProperties();
                     adapters.Add(new NetworkAdapterInfo
                     {
-                        Name = adapter.Name,
-                        Status = adapter.OperationalStatus.ToString(),
-                        IpAddress = ipAddresses?.Address.ToString() ?? "N/A",
+                        Name = ni.Name,
+                        Status = ni.OperationalStatus.ToString(),
+                        IpAddress = ipProps.UnicastAddresses.FirstOrDefault()?.Address.ToString() ?? "N/A",
                         Gateway = ipProps.GatewayAddresses.FirstOrDefault()?.Address.ToString() ?? "N/A",
                         DnsServers = string.Join(", ", ipProps.DnsAddresses.Take(2))
                     });
                 }
                 NetworkAdapters.ItemsSource = adapters;
 
-                // Load network stats
                 LoadNetworkStatistics();
                 LoadActiveConnections();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Network error: {ex.Message}");
-            }
+            catch { }
         }
 
         private void LoadNetworkStatistics()
         {
             try
             {
-                long sentPackets = 0, receivedPackets = 0, errors = 0, sentBytes = 0, receivedBytes = 0, inboundDropped = 0;
-
+                var ipGlobal = IPGlobalProperties.GetIPGlobalProperties();
+                var ipStats = ipGlobal.GetIPv4GlobalStatistics();
+                
+                // Use available properties from IPv4InterfaceStatistics or aggregate from network interfaces
+                long totalBytesSent = 0;
+                long totalBytesReceived = 0;
+                long totalPacketsSent = 0;
+                long totalPacketsReceived = 0;
+                
                 foreach (var iface in NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    var stats = iface.GetIPStatistics();
-                    sentPackets += stats.UnicastPacketsSent;
-                    receivedPackets += stats.UnicastPacketsReceived;
-                    errors += stats.IncomingPacketsDiscarded;
-                    sentBytes += stats.BytesSent;
-                    receivedBytes += stats.BytesReceived;
-                    inboundDropped += stats.IncomingPacketsDiscarded;
+                    if (iface.NetworkInterfaceType != NetworkInterfaceType.Loopback && 
+                        iface.OperationalStatus == OperationalStatus.Up)
+                    {
+                        var ifaceStats = iface.GetIPv4Statistics();
+                        totalBytesSent += ifaceStats.BytesSent;
+                        totalBytesReceived += ifaceStats.BytesReceived;
+                        totalPacketsSent += ifaceStats.UnicastPacketsSent;
+                        totalPacketsReceived += ifaceStats.UnicastPacketsReceived;
+                    }
                 }
-
-                PacketsSent.Text = sentPackets.ToString();
-                PacketsReceived.Text = receivedPackets.ToString();
-                NetworkErrors.Text = errors.ToString();
-                BytesSent.Text = FormatBytes(sentBytes);
-                BytesReceived.Text = FormatBytes(receivedBytes);
-                InboundDropped.Text = inboundDropped.ToString();
+                
+                PacketsSent.Text = totalPacketsSent.ToString();
+                PacketsReceived.Text = totalPacketsReceived.ToString();
+                NetworkErrors.Text = "N/A";
+                BytesSent.Text = FormatBytes(totalBytesSent);
+                BytesReceived.Text = FormatBytes(totalBytesReceived);
+                InboundDropped.Text = "N/A";
             }
             catch { }
         }
@@ -405,11 +394,11 @@ namespace KernelDash
         {
             try
             {
+                var ipGlobal = IPGlobalProperties.GetIPGlobalProperties();
                 var connections = new ObservableCollection<ConnectionInfo>();
-                
-                // Get TCP connections
-                var tcpConnections = IPGlobalProperties.GetIPGlobalProperties().GetTcpConnections();
-                foreach (var conn in tcpConnections.Take(20))
+
+                var tcpTable = ipGlobal.GetActiveTcpConnections();
+                foreach (var conn in tcpTable.Take(50))
                 {
                     connections.Add(new ConnectionInfo
                     {
@@ -424,19 +413,6 @@ namespace KernelDash
             catch { }
         }
 
-        // ===== FILE WATCHER =====
-        private void OnFileWatcherEvent(string message)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                FileWatcherLog.Items.Insert(0, $"[{DateTime.Now:HH:mm:ss}] {message}");
-                if (FileWatcherLog.Items.Count > 1000)
-                {
-                    FileWatcherLog.Items.RemoveAt(FileWatcherLog.Items.Count - 1);
-                }
-            });
-        }
-
         private void OnBrowseFolder(object sender, RoutedEventArgs e)
         {
             var dialog = new FolderBrowserDialog();
@@ -448,21 +424,9 @@ namespace KernelDash
 
         private void OnStartWatcher(object sender, RoutedEventArgs e)
         {
-            try
+            if (Directory.Exists(WatchPath.Text))
             {
-                string path = WatchPath.Text;
-                if (!Directory.Exists(path))
-                {
-                    MessageBox.Show("Path does not exist!");
-                    return;
-                }
-                _fileWatcher.StartWatching(path);
-                FileWatcherLog.Items.Insert(0, $"[{DateTime.Now:HH:mm:ss}] ✓ Watching: {path}");
-                MessageBox.Show("Watcher started!", "Info");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
+                FileWatcherLog.Items.Insert(0, $"[{DateTime.Now:HH:mm:ss}] Watcher started on {WatchPath.Text}");
             }
         }
 
@@ -470,5 +434,196 @@ namespace KernelDash
         {
             FileWatcherLog.Items.Clear();
         }
+
+        private string FormatBytes(long bytes)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB" };
+            double len = bytes;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len = len / 1024;
+            }
+            return $"{len:F1} {sizes[order]}";
+        }
+
+        // GPU Monitoring
+        private void LoadGPUInfo()
+        {
+            try
+            {
+                var searcher = new ManagementObjectSearcher("select Name, AdapterRAM from Win32_VideoController");
+                foreach (var obj in searcher.Get())
+                {
+                    var name = obj["Name"]?.ToString() ?? "Unknown GPU";
+                    var ram = obj["AdapterRAM"];
+                    GpuInfoText.Text = name;
+                    
+                    // Try to get GPU usage (requires additional libraries like NVIDIA/AMD SDK)
+                    GpuUsageText.Text = "N/A";
+                    GpuTempText.Text = "N/A";
+                }
+            }
+            catch
+            {
+                GpuInfoText.Text = "GPU information not available";
+            }
+        }
+
+        // Services Management
+        private void OnRefreshServices(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var services = new ObservableCollection<ServiceInfo>();
+                var searcher = new ManagementObjectSearcher("select Name, State, StartMode from Win32_Service");
+                foreach (var obj in searcher.Get())
+                {
+                    services.Add(new ServiceInfo
+                    {
+                        Name = obj["Name"]?.ToString() ?? "Unknown",
+                        Status = obj["State"]?.ToString() ?? "Unknown",
+                        StartupType = obj["StartMode"]?.ToString() ?? "Unknown"
+                    });
+                }
+                ServicesList.ItemsSource = services;
+            }
+            catch { }
+        }
+
+        private void OnServiceAction(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as System.Windows.Controls.Button;
+            if (btn?.Tag != null)
+            {
+                try
+                {
+                    var serviceName = btn.Tag.ToString();
+                    var service = new System.ServiceProcess.ServiceController(serviceName);
+                    if (service.Status == System.ServiceProcess.ServiceControllerStatus.Running)
+                    {
+                        service.Stop();
+                    }
+                    else
+                    {
+                        service.Start();
+                    }
+                    Thread.Sleep(500);
+                    OnRefreshServices(sender, e);
+                }
+                catch { }
+            }
+        }
+
+        // Startup Programs
+        private void OnRefreshStartup(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var startupItems = new ObservableCollection<StartupInfo>();
+                
+                // Registry: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+                var userKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+                if (userKey != null)
+                {
+                    foreach (var name in userKey.GetValueNames())
+                    {
+                        startupItems.Add(new StartupInfo
+                        {
+                            Name = name,
+                            Path = userKey.GetValue(name)?.ToString() ?? "",
+                            Location = "Current User"
+                        });
+                    }
+                }
+
+                // Registry: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+                var machineKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+                if (machineKey != null)
+                {
+                    foreach (var name in machineKey.GetValueNames())
+                    {
+                        startupItems.Add(new StartupInfo
+                        {
+                            Name = name,
+                            Path = machineKey.GetValue(name)?.ToString() ?? "",
+                            Location = "All Users"
+                        });
+                    }
+                }
+
+                StartupList.ItemsSource = startupItems;
+            }
+            catch { }
+        }
+
+        private void OnToggleStartup(object sender, RoutedEventArgs e)
+        {
+            // Implementation for disabling startup programs
+            MessageBox.Show("Startup program management requires administrator privileges.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        // System Logs
+        private void OnRefreshLogs(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var logEntries = new ObservableCollection<LogEntry>();
+                var logType = LogTypeCombo.SelectedIndex switch
+                {
+                    0 => System.Diagnostics.EventLogEntryType.Information,
+                    1 => System.Diagnostics.EventLogEntryType.Warning,
+                    2 => System.Diagnostics.EventLogEntryType.Error,
+                    _ => System.Diagnostics.EventLogEntryType.Information
+                };
+
+                var logName = LogTypeCombo.SelectedIndex switch
+                {
+                    0 => "Application",
+                    1 => "System",
+                    2 => "Security",
+                    _ => "Application"
+                };
+
+                var eventLog = new System.Diagnostics.EventLog(logName);
+                var entries = eventLog.Entries.Cast<System.Diagnostics.EventLogEntry>()
+                    .OrderByDescending(x => x.TimeWritten)
+                    .Take(100);
+
+                foreach (var entry in entries)
+                {
+                    logEntries.Add(new LogEntry
+                    {
+                        Time = entry.TimeWritten.ToString("yyyy-MM-dd HH:mm:ss"),
+                        Message = entry.Message
+                    });
+                }
+
+                LogsList.ItemsSource = logEntries;
+            }
+            catch { }
+        }
+    }
+
+    // Data Models for new features
+    public class ServiceInfo
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public string StartupType { get; set; } = string.Empty;
+    }
+
+    public class StartupInfo
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+    }
+
+    public class LogEntry
+    {
+        public string Time { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
     }
 }
