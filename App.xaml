@@ -4,65 +4,65 @@
              xmlns:local="clr-namespace:KernelDash"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <!-- MODERN ANTHRACITE COLOR SCHEME -->
-        <Color x:Key="PrimaryBlue">#5B9BD5</Color>
-        <Color x:Key="PrimaryGreen">#70AD47</Color>
-        <Color x:Key="PrimaryPurple">#9D4EDD</Color>
-        <Color x:Key="AccentCyan">#4ECDC4</Color>
-        <Color x:Key="AccentOrange">#FF8C42</Color>
-        <Color x:Key="AccentRed">#E74C3C</Color>
-        <Color x:Key="DarkBg">#1A1A1A</Color>
-        <Color x:Key="CardBg">#2A2A2A</Color>
-        <Color x:Key="GlassBg">#333333</Color>
+        <!-- APPLE STYLE COLOR SCHEME WITH LARGER TEXT -->
+        <Color x:Key="PrimaryBlue">#007AFF</Color>
+        <Color x:Key="PrimaryGreen">#34C759</Color>
+        <Color x:Key="PrimaryPurple">#AF52DE</Color>
+        <Color x:Key="AccentCyan">#32D74B</Color>
+        <Color x:Key="AccentOrange">#FF9F0A</Color>
+        <Color x:Key="AccentRed">#FF3B30</Color>
+        <Color x:Key="DarkBg">#000000</Color>
+        <Color x:Key="CardBg">#1C1C1E</Color>
+        <Color x:Key="GlassBg">#2C2C2E</Color>
         <Color x:Key="TextLight">#FFFFFF</Color>
-        <Color x:Key="TextMuted">#B0B0B0</Color>
+        <Color x:Key="TextMuted">#8E8E93</Color>
 
-        <SolidColorBrush x:Key="BackgroundDark" Color="#1A1A1A"/>
+        <SolidColorBrush x:Key="BackgroundDark" Color="#000000"/>
         <SolidColorBrush x:Key="BackgroundLight" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="CardBackground" Color="#2A2A2A"/>
-        <SolidColorBrush x:Key="SidebarBg" Color="#252525"/>
-        <SolidColorBrush x:Key="AccentColor" Color="#5B9BD5"/>
-        <SolidColorBrush x:Key="AccentColorHover" Color="#6BA8E0"/>
+        <SolidColorBrush x:Key="CardBackground" Color="#1C1C1E"/>
+        <SolidColorBrush x:Key="SidebarBg" Color="#1C1C1E"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#007AFF"/>
+        <SolidColorBrush x:Key="AccentColorHover" Color="#0051D5"/>
         <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#B0B0B0"/>
-        <SolidColorBrush x:Key="BorderColor" Color="#404040"/>
-        <SolidColorBrush x:Key="SuccessColor" Color="#70AD47"/>
-        <SolidColorBrush x:Key="WarningColor" Color="#FF8C42"/>
-        <SolidColorBrush x:Key="DangerColor" Color="#E74C3C"/>
-        <SolidColorBrush x:Key="InfoColor" Color="#4ECDC4"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#AEAEB2"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#38383A"/>
+        <SolidColorBrush x:Key="SuccessColor" Color="#34C759"/>
+        <SolidColorBrush x:Key="WarningColor" Color="#FF9F0A"/>
+        <SolidColorBrush x:Key="DangerColor" Color="#FF3B30"/>
+        <SolidColorBrush x:Key="InfoColor" Color="#32D74B"/>
 
-        <!-- GRADIENT BRUSHES -->
+        <!-- APPLE STYLE GRADIENT BRUSHES -->
         <LinearGradientBrush x:Key="BlueGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#5B9BD5" Offset="0"/>
-            <GradientStop Color="#7BB3E0" Offset="1"/>
+            <GradientStop Color="#007AFF" Offset="0"/>
+            <GradientStop Color="#5AC8FA" Offset="1"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="GreenGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#70AD47" Offset="0"/>
-            <GradientStop Color="#8BC34A" Offset="1"/>
+            <GradientStop Color="#34C759" Offset="0"/>
+            <GradientStop Color="#30D158" Offset="1"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="PurpleGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#9D4EDD" Offset="0"/>
-            <GradientStop Color="#C77DFF" Offset="1"/>
+            <GradientStop Color="#AF52DE" Offset="0"/>
+            <GradientStop Color="#BF5AF2" Offset="1"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="OrangeGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#FF8C42" Offset="0"/>
-            <GradientStop Color="#FFA366" Offset="1"/>
+            <GradientStop Color="#FF9F0A" Offset="0"/>
+            <GradientStop Color="#FFCC02" Offset="1"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="RedGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#E74C3C" Offset="0"/>
-            <GradientStop Color="#EC7063" Offset="1"/>
+            <GradientStop Color="#FF3B30" Offset="0"/>
+            <GradientStop Color="#FF453A" Offset="1"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="CyanGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#4ECDC4" Offset="0"/>
-            <GradientStop Color="#6EDDD5" Offset="1"/>
+            <GradientStop Color="#32D74B" Offset="0"/>
+            <GradientStop Color="#63D869" Offset="1"/>
         </LinearGradientBrush>
 
-        <!-- MODERN BUTTON STYLE WITH ANIMATION -->
+        <!-- APPLE STYLE BUTTON WITH SMOOTH ANIMATION -->
         <Style x:Key="ModernButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource AccentColor}"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="Padding" Value="16,12"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="20,14"/>
+            <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontWeight" Value="600"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -70,9 +70,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <Border Name="border" Background="{TemplateBinding Background}" CornerRadius="15">
+                            <Border Name="border" Background="{TemplateBinding Background}" CornerRadius="25">
                                 <Border.Effect>
-                                    <DropShadowEffect BlurRadius="15" Opacity="0.3" ShadowDepth="2" Color="#000000"/>
+                                    <DropShadowEffect BlurRadius="20" Opacity="0.4" ShadowDepth="0" Color="#000000"/>
                                 </Border.Effect>
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
@@ -83,73 +83,95 @@
                                 <Trigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.BlurRadius)" 
-                                                           From="15" To="22" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" 
+                                                           From="1.0" To="1.05" Duration="0:0:0.15"/>
+                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" 
+                                                           From="1.0" To="1.05" Duration="0:0:0.15"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" 
+                                                           From="1.05" To="1.0" Duration="0:0:0.15"/>
+                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" 
+                                                           From="1.05" To="1.0" Duration="0:0:0.15"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.85"/>
+                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-        <!-- GLASSMORPHISM CARD STYLE -->
+        <!-- APPLE STYLE GLASSMORPHISM CARD -->
         <Style x:Key="ModernCard" TargetType="Border">
             <Setter Property="Background">
                 <Setter.Value>
-                    <SolidColorBrush Color="#2A2A2A" Opacity="0.75"/>
+                    <SolidColorBrush Color="#1C1C1E" Opacity="0.8"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="BorderBrush">
                 <Setter.Value>
-                    <SolidColorBrush Color="#FFFFFF" Opacity="0.12"/>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.08"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="15"/>
-            <Setter Property="Padding" Value="24"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="28"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="25" Opacity="0.3" ShadowDepth="3" Color="#000000"/>
+                    <DropShadowEffect BlurRadius="40" Opacity="0.6" ShadowDepth="0" Color="#000000"/>
                 </Setter.Value>
             </Setter>
         </Style>
         
-        <!-- GLASSMORPHISM STAT CARD -->
+        <!-- APPLE STYLE GLASSMORPHISM STAT CARD -->
         <Style x:Key="GlassStatCard" TargetType="Border">
             <Setter Property="Background">
                 <Setter.Value>
-                    <SolidColorBrush Color="#2A2A2A" Opacity="0.7"/>
+                    <SolidColorBrush Color="#1C1C1E" Opacity="0.6"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="BorderBrush">
                 <Setter.Value>
-                    <SolidColorBrush Color="#FFFFFF" Opacity="0.1"/>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.06"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="15"/>
-            <Setter Property="Padding" Value="20"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="24"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="20" Opacity="0.25" ShadowDepth="2" Color="#000000"/>
+                    <DropShadowEffect BlurRadius="30" Opacity="0.5" ShadowDepth="0" Color="#000000"/>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- MODERN SIDEBAR BUTTON WITH GLASSMORPHISM -->
+        <!-- APPLE STYLE SIDEBAR BUTTON -->
         <Style x:Key="SidebarButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="17"/>
             <Setter Property="FontWeight" Value="500"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="20,14"/>
+            <Setter Property="Padding" Value="24,16"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -157,27 +179,27 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <Border Name="border" Background="{TemplateBinding Background}" CornerRadius="12" Margin="12,4">
+                            <Border Name="border" Background="{TemplateBinding Background}" CornerRadius="16" Margin="16,6">
                                 <Border.Effect>
-                                    <DropShadowEffect x:Name="shadow" BlurRadius="0" Opacity="0" ShadowDepth="0" Color="#5B9BD5"/>
+                                    <DropShadowEffect x:Name="shadow" BlurRadius="0" Opacity="0" ShadowDepth="0" Color="#007AFF"/>
                                 </Border.Effect>
-                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" Margin="12,0,0,0"/>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background">
                                     <Setter.Value>
-                                        <SolidColorBrush Color="#5B9BD5" Opacity="0.15"/>
+                                        <SolidColorBrush Color="#007AFF" Opacity="0.1"/>
                                     </Setter.Value>
                                 </Setter>
                                 <Trigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="BlurRadius" 
-                                                           From="0" To="12" Duration="0:0:0.2"/>
+                                                           From="0" To="15" Duration="0:0:0.2"/>
                                             <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="Opacity" 
-                                                           From="0" To="0.4" Duration="0:0:0.2"/>
+                                                           From="0" To="0.3" Duration="0:0:0.2"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.EnterActions>
@@ -185,9 +207,9 @@
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="BlurRadius" 
-                                                           From="12" To="0" Duration="0:0:0.2"/>
+                                                           From="15" To="0" Duration="0:0:0.2"/>
                                             <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="Opacity" 
-                                                           From="0.4" To="0" Duration="0:0:0.2"/>
+                                                           From="0.3" To="0" Duration="0:0:0.2"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.ExitActions>
@@ -198,14 +220,14 @@
             </Setter>
         </Style>
         
-        <!-- ACTIVE SIDEBAR BUTTON STYLE -->
+        <!-- ACTIVE APPLE STYLE SIDEBAR BUTTON -->
         <Style x:Key="ActiveSidebarButton" TargetType="Button" BasedOn="{StaticResource SidebarButton}">
             <Setter Property="Background">
                 <Setter.Value>
-                    <SolidColorBrush Color="#5B9BD5" Opacity="0.2"/>
+                    <SolidColorBrush Color="#007AFF" Opacity="0.15"/>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Foreground" Value="#5B9BD5"/>
+            <Setter Property="Foreground" Value="#007AFF"/>
             <Setter Property="FontWeight" Value="600"/>
         </Style>
 
@@ -220,23 +242,343 @@
             </Setter>
         </Style>
         
-        <!-- PULSING ANIMATION FOR PROGRESS BARS -->
-        <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
-                           From="0.6" To="1.0" Duration="0:0:1.5" 
-                           AutoReverse="True"/>
-        </Storyboard>
+        <!-- WINDOW CONTROL BUTTON STYLE -->
+        <Style x:Key="WindowControlButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#FFFFFF" Opacity="0.1"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#FFFFFF" Opacity="0.2"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         
-        <!-- BADGE STYLE -->
+        <!-- APPLE STYLE INFO BADGE -->
         <Style x:Key="InfoBadge" TargetType="Border">
-            <Setter Property="Background" Value="#333333"/>
-            <Setter Property="BorderBrush" Value="#404040"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="#2C2C2E" Opacity="0.8"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush">
+                <Setter.Value>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.08"/>
+                </Setter.Value>
+            </Setter>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="16,12"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="8" Opacity="0.15" ShadowDepth="1" Color="#000000"/>
+                    <DropShadowEffect BlurRadius="15" Opacity="0.3" ShadowDepth="0" Color="#000000"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" 
+                                               From="1.0" To="1.02" Duration="0:0:0.15"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" 
+                                               From="1.0" To="1.02" Duration="0:0:0.15"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" 
+                                               From="1.02" To="1.0" Duration="0:0:0.15"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" 
+                                               From="1.02" To="1.0" Duration="0:0:0.15"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!-- ENHANCED LOADING ANIMATION -->
+        <Storyboard x:Key="EnhancedPulseAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                           From="0.4" To="1.0" Duration="0:0:1.2" 
+                           AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        
+        <!-- SMOOTH FADE IN ANIMATION -->
+        <Storyboard x:Key="FadeInAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                           From="0.0" To="1.0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" 
+                           From="0.95" To="1.0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" 
+                           From="0.95" To="1.0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Custom Scrollbar Styles -->
+        <Style x:Key="ModernScrollBar" TargetType="ScrollBar">
+            <Setter Property="Background" Value="#2C2C2E"/>
+            <Setter Property="Foreground" Value="#8E8E93"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid x:Name="Root" Background="Transparent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Top Button -->
+                            <RepeatButton x:Name="PART_LineUpButton" 
+                                        Grid.Row="0" 
+                                        Background="#3A3A3C" 
+                                        BorderThickness="0"
+                                        Width="12" Height="12">
+                                <RepeatButton.Template>
+                                    <ControlTemplate TargetType="RepeatButton">
+                                        <Border Background="#3A3A3C" CornerRadius="6">
+                                            <Path Data="M0,4 L6,0 L12,4" 
+                                                  Stroke="#8E8E93" 
+                                                  StrokeThickness="1.5" 
+                                                  HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </RepeatButton.Template>
+                            </RepeatButton>
+                            
+                            <!-- Track -->
+                            <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{x:Null}" Template="{x:Null}"/>
+                                </Track.DecreaseRepeatButton>
+                                
+                                <Track.Thumb>
+                                    <Thumb x:Name="PART_Thumb" 
+                                           Background="#4A4A4C" 
+                                           BorderThickness="0" 
+                                           Width="12" 
+                                           Margin="0,2">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="#4A4A4C" CornerRadius="6">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect BlurRadius="4" Opacity="0.3" ShadowDepth="0" Color="#000000"/>
+                                                    </Border.Effect>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{x:Null}" Template="{x:Null}"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                            
+                            <!-- Bottom Button -->
+                            <RepeatButton x:Name="PART_LineDownButton" 
+                                        Grid.Row="2" 
+                                        Background="#3A3A3C" 
+                                        BorderThickness="0"
+                                        Width="12" Height="12">
+                                <RepeatButton.Template>
+                                    <ControlTemplate TargetType="RepeatButton">
+                                        <Border Background="#3A3A3C" CornerRadius="6">
+                                            <Path Data="M0,0 L6,4 L12,0" 
+                                                  Stroke="#8E8E93" 
+                                                  StrokeThickness="1.5" 
+                                                  HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </RepeatButton.Template>
+                            </RepeatButton>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernHorizontalScrollBar" TargetType="ScrollBar">
+            <Setter Property="Background" Value="#2C2C2E"/>
+            <Setter Property="Foreground" Value="#8E8E93"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid x:Name="Root" Background="Transparent">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Left Button -->
+                            <RepeatButton x:Name="PART_LineLeftButton" 
+                                        Grid.Column="0" 
+                                        Background="#3A3A3C" 
+                                        BorderThickness="0"
+                                        Width="12" Height="12">
+                                <RepeatButton.Template>
+                                    <ControlTemplate TargetType="RepeatButton">
+                                        <Border Background="#3A3A3C" CornerRadius="6">
+                                            <Path Data="M4,0 L0,6 L4,12" 
+                                                  Stroke="#8E8E93" 
+                                                  StrokeThickness="1.5" 
+                                                  HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </RepeatButton.Template>
+                            </RepeatButton>
+                            
+                            <!-- Track -->
+                            <Track x:Name="PART_Track" Grid.Column="1" IsDirectionReversed="False">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{x:Null}" Template="{x:Null}"/>
+                                </Track.DecreaseRepeatButton>
+                                
+                                <Track.Thumb>
+                                    <Thumb x:Name="PART_Thumb" 
+                                           Background="#4A4A4C" 
+                                           BorderThickness="0" 
+                                           Height="12" 
+                                           Margin="2,0">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="#4A4A4C" CornerRadius="6">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect BlurRadius="4" Opacity="0.3" ShadowDepth="0" Color="#000000"/>
+                                                    </Border.Effect>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{x:Null}" Template="{x:Null}"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                            
+                            <!-- Right Button -->
+                            <RepeatButton x:Name="PART_LineRightButton" 
+                                        Grid.Column="2" 
+                                        Background="#3A3A3C" 
+                                        BorderThickness="0"
+                                        Width="12" Height="12">
+                                <RepeatButton.Template>
+                                    <ControlTemplate TargetType="RepeatButton">
+                                        <Border Background="#3A3A3C" CornerRadius="6">
+                                            <Path Data="M8,0 L12,6 L8,12" 
+                                                  Stroke="#8E8E93" 
+                                                  StrokeThickness="1.5" 
+                                                  HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </RepeatButton.Template>
+                            </RepeatButton>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Apply custom scrollbars to ScrollViewer -->
+        <Style TargetType="ScrollViewer">
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" 
+                                                    Grid.Column="0" 
+                                                    Grid.Row="0" 
+                                                    Content="{TemplateBinding Content}"/>
+                            
+                            <ScrollBar x:Name="PART_VerticalScrollBar" 
+                                         Grid.Column="1" 
+                                         Grid.Row="0" 
+                                         Orientation="Vertical" 
+                                         Style="{StaticResource ModernScrollBar}"
+                                         Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                         Maximum="{TemplateBinding ScrollableHeight}" 
+                                         ViewportSize="{TemplateBinding ViewportHeight}" 
+                                         Value="{TemplateBinding VerticalOffset}"/>
+                            
+                            <ScrollBar x:Name="PART_HorizontalScrollBar" 
+                                         Grid.Column="0" 
+                                         Grid.Row="1" 
+                                         Orientation="Horizontal" 
+                                         Style="{StaticResource ModernHorizontalScrollBar}"
+                                         Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                         Maximum="{TemplateBinding ScrollableWidth}" 
+                                         ViewportSize="{TemplateBinding ViewportWidth}" 
+                                         Value="{TemplateBinding HorizontalOffset}"/>
+                        </Grid>
+                    </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
